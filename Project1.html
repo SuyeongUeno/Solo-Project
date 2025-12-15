@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>Admin Page</title>
+  <style>
+    body.dark-mode { background:#121212; color:#e9e9e9; }
+    body.dark-mode .table,
+    body.dark-mode .card,
+    body.dark-mode .modal-content,
+    body.dark-mode .form-control,
+    body.dark-mode .form-select { background:#1f1f1f; color:#e9e9e9; border-color:#333; }
+    body.dark-mode .table thead th { background:#222; color:#fff; }
+    body.dark-mode .pagination .page-link { background:#1f1f1f; color:#e9e9e9; border-color:#333; }
+    body.dark-mode .pagination .page-item.active .page-link { border-color:#666; }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center gap-2">
+      <h3 class="mt-5 mb-3">신규 등록 상품</h3>
+      <div class="d-flex align-items-center gap-2">
+        <div class="small text-muted" id="clock"></div>
+        <button class="btn btn-outline-secondary btn-sm" id="darkModeBtn" type="button">다크모드</button>
+        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#signupModal">회원 가입</button>
+      </div>
+    </div>
+
+    <form class="row row-cols-lg-auto g-3 align-items-center">
+      <div class="col-12">
+        <select class="form-select" id="inlineFormSelectPref" name="category_data_table">
+          <option value="전체" selected>전체</option>
+          <option value="상의">상의</option>
+          <option value="하의">하의</option>
+          <option value="신발">신발</option>
+          <option value="패션잡화">패션잡화</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <select class="form-select" id="genderSelect">
+          <option value="전체" selected>성별(전체)</option>
+          <option value="남성">남성</option>
+          <option value="여성">여성</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <div class="input-group">
+          <input type="text" class="form-control" id="productNameInput" placeholder="제품명을 입력해주세요" />
+          <button class="btn btn-dark" type="button" id="searchBtn">조회</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="container mt-3">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>카테고리</th>
+            <th>브랜드</th>
+            <th>상품명</th>
+            <th class="text-end">가격</th>
+          </tr>
+        </thead>
+        <tbody id="product_data_Table"></tbody>
+      </table>
+    </div>
+
+    <nav class="d-flex justify-content-center">
+      <ul class="pagination" id="pagination"></ul>
+    </nav>
+  </div>
+
+  <div class="modal fade" id="signupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">회원 가입</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="signupForm" novalidate>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">아이디</label>
+                <input type="text" class="form-control" id="userId" required />
+                <div class="invalid-feedback">아이디는 4~12자, 영문/숫자만 가능합니다.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">이메일</label>
+                <input type="email" class="form-control" id="email" required />
+                <div class="invalid-feedback">올바른 이메일 형식을 입력해주세요.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">비밀번호</label>
+                <input type="password" class="form-control" id="pw" required />
+                <div class="invalid-feedback">비밀번호는 8자 이상, 영문/숫자/특수문자 포함이어야 합니다.</div>
+
+                <div class="progress mt-2" style="height:8px;">
+                  <div class="progress-bar" id="pwStrengthBar" style="width:0%"></div>
+                </div>
+                <div class="small mt-1" id="pwStrengthText"></div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">비밀번호 확인</label>
+                <input type="password" class="form-control" id="pw2" required />
+                <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">이름</label>
+                <input type="text" class="form-control" id="name" required />
+                <div class="invalid-feedback">이름을 입력해주세요.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">성별</label>
+                <select class="form-select" id="signupGender" required>
+                  <option value="" selected disabled>선택</option>
+                  <option value="남성">남성</option>
+                  <option value="여성">여성</option>
+                  <option value="기타">기타</option>
+                </select>
+                <div class="invalid-feedback">성별을 선택해주세요.</div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">휴대폰 번호</label>
+                <input type="tel" class="form-control" id="phone" placeholder="01012345678" required />
+                <div class="invalid-feedback">휴대폰 번호는 숫자만 10~11자리로 입력해주세요.</div>
+              </div>
+
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary w-100">가입하기</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const product_data = [
+      { category: "상의", brand: "Supreme", product: "슈프림 박스로고 후드티", price: "390,000" },
+      { category: "하의", brand: "DIESEL", product: "디젤 트랙 팬츠", price: "188,000" },
+      { category: "신발", brand: "Nike", product: "에어포스 1", price: "137,000" },
+      { category: "패션잡화", brand: "Music&Goods", product: "빵빵이 키링", price: "29,000" },
+      { category: "상의", brand: "Uniqlo", product: "기본 티셔츠", price: "12,900" },
+      { category: "하의", brand: "Levi's", product: "501 청바지", price: "119,000" }
+    ];
+
+    const tableBody = document.getElementById("product_data_Table");
+    const categorySelect = document.getElementById("inlineFormSelectPref");
+    const input = document.getElementById("productNameInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const pagination = document.getElementById("pagination");
+    const darkBtn = document.getElementById("darkModeBtn");
+    const clock = document.getElementById("clock");
+    const PAGE_SIZE = 5;
+    let currentPage = 1;
+
+    function setDarkMode(isDark) {
+      document.body.classList.toggle("dark-mode", isDark);
+      darkBtn.textContent = isDark ? "라이트모드" : "다크모드";
+      localStorage.setItem("darkMode", isDark ? "1" : "0");
+    }
+
+    setDarkMode(localStorage.getItem("darkMode") === "1");
+
+    darkBtn.onclick = () => setDarkMode(!document.body.classList.contains("dark-mode"));
+
+    function updateClock() {
+      const d = new Date();
+      clock.textContent = d.toLocaleString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function getFiltered() {
+      return product_data.filter(p =>
+        (categorySelect.value === "전체" || p.category === categorySelect.value) &&
+        p.product.includes(input.value)
+      );
+    }
+
+    function renderTable(data) {
+      tableBody.innerHTML = "";
+      if (data.length === 0) {
+        const r = tableBody.insertRow();
+        const c = r.insertCell(0);
+        c.colSpan = 4;
+        c.className = "text-center text-muted py-3";
+        c.textContent = "검색 결과가 없습니다.";
+        return;
+      }
+      data.forEach(p => {
+        const r = tableBody.insertRow();
+        r.insertCell(0).textContent = p.category;
+        r.insertCell(1).textContent = p.brand;
+        r.insertCell(2).textContent = p.product;
+        r.insertCell(3).textContent = p.price;
+        r.cells[3].classList.add("text-end");
+      });
+    }
+
+    function renderPagination(total) {
+      pagination.innerHTML = "";
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      for (let i = 1; i <= pages; i++) {
+        const li = document.createElement("li");
+        li.className = "page-item " + (i === currentPage ? "active" : "");
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.onclick = e => {
+          e.preventDefault();
+          currentPage = i;
+          render();
+        };
+        pagination.appendChild(li);
+      }
+    }
+
+    function render() {
+      const data = getFiltered();
+      const start = (currentPage - 1) * PAGE_SIZE;
+      renderTable(data.slice(start, start + PAGE_SIZE));
+      renderPagination(data.length);
+    }
+
+    searchBtn.onclick = () => { currentPage = 1; render(); };
+    categorySelect.onchange = () => { currentPage = 1; render(); };
+
+    const form = document.getElementById("signupForm");
+
+    function validUserId(v) { return /^[a-zA-Z0-9]{4,12}$/.test(v); }
+    function validPassword(v) { return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(v); }
+    function validPhone(v) { return /^\d{10,11}$/.test(v); }
+
+    function setInvalid(el, isInvalid) {
+      el.classList.toggle("is-invalid", isInvalid);
+      el.classList.toggle("is-valid", !isInvalid);
+    }
+
+    const pwStrengthBar = document.getElementById("pwStrengthBar");
+    const pwStrengthText = document.getElementById("pwStrengthText");
+
+    function calcPwStrength(pw) {
+      let score = 0;
+      if (pw.length >= 8) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[a-z]/.test(pw)) score++;
+      if (/\d/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      if (pw.length >= 12) score++;
+
+      if (score <= 2) return { pct: 25, text: "약함", cls: "bg-danger" };
+      if (score <= 4) return { pct: 60, text: "보통", cls: "bg-warning" };
+      return { pct: 100, text: "강함", cls: "bg-success" };
+    }
+
+    function runLiveValidation() {
+      const userId = document.getElementById("userId");
+      const email = document.getElementById("email");
+      const pw = document.getElementById("pw");
+      const pw2 = document.getElementById("pw2");
+      const name = document.getElementById("name");
+      const gender = document.getElementById("signupGender");
+      const phone = document.getElementById("phone");
+
+      const c1 = validUserId(userId.value.trim());
+      const c2 = email.checkValidity();
+      const c3 = validPassword(pw.value);
+      const c4 = pw.value === pw2.value && pw2.value.length > 0;
+      const c5 = name.value.trim().length > 0;
+      const c6 = gender.value !== "";
+      const c7 = validPhone(phone.value.trim());
+
+      if (userId.value.length) setInvalid(userId, !c1);
+      if (email.value.length) setInvalid(email, !c2);
+      if (pw.value.length) setInvalid(pw, !c3);
+      if (pw2.value.length) setInvalid(pw2, !c4);
+      if (name.value.length) setInvalid(name, !c5);
+      if (gender.value) setInvalid(gender, !c6);
+      if (phone.value.length) setInvalid(phone, !c7);
+
+      const s = calcPwStrength(pw.value);
+      pwStrengthBar.className = "progress-bar " + s.cls;
+      pwStrengthBar.style.width = s.pct + "%";
+      pwStrengthText.textContent = pw.value.length ? `비밀번호 강도: ${s.text}` : "";
+    }
+
+    ["userId","email","pw","pw2","name","signupGender","phone"].forEach(id => {
+      document.getElementById(id).addEventListener("input", runLiveValidation);
+      document.getElementById(id).addEventListener("change", runLiveValidation);
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const userId = document.getElementById("userId");
+      const email = document.getElementById("email");
+      const pw = document.getElementById("pw");
+      const pw2 = document.getElementById("pw2");
+      const name = document.getElementById("name");
+      const gender = document.getElementById("signupGender");
+      const phone = document.getElementById("phone");
+
+      const c1 = validUserId(userId.value.trim());
+      const c2 = email.checkValidity();
+      const c3 = validPassword(pw.value);
+      const c4 = pw.value === pw2.value && pw2.value.length > 0;
+      const c5 = name.value.trim().length > 0;
+      const c6 = gender.value !== "";
+      const c7 = validPhone(phone.value.trim());
+
+      setInvalid(userId, !c1);
+      setInvalid(email, !c2);
+      setInvalid(pw, !c3);
+      setInvalid(pw2, !c4);
+      setInvalid(name, !c5);
+      setInvalid(gender, !c6);
+      setInvalid(phone, !c7);
+
+      if (!(c1 && c2 && c3 && c4 && c5 && c6 && c7)) return;
+
+      const summary =
+        `회원가입 완료!\n\n` +
+        `아이디: ${userId.value}\n` +
+        `이메일: ${email.value}\n` +
+        `이름: ${name.value}\n` +
+        `성별: ${gender.value}\n` +
+        `휴대폰: ${phone.value}`;
+
+      alert(summary);
+
+      const payload = {
+        userId: userId.value,
+        email: email.value,
+        name: name.value,
+        gender: gender.value,
+        phone: phone.value
+      };
+      localStorage.setItem("signupResult", JSON.stringify(payload));
+
+      bootstrap.Modal.getInstance(document.getElementById("signupModal")).hide();
+      location.href = "signup-success.html";
+    });
+
+    render();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
